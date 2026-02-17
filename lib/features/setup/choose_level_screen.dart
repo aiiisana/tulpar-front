@@ -3,6 +3,7 @@ import '../../widgets/primary_button.dart';
 import '../../widgets/progress_header.dart';
 import '../../widgets/select_pill.dart';
 import 'daily_goal_screen.dart';
+import '../../app/app_storage.dart';
 
 class ChooseLevelScreen extends StatefulWidget {
   const ChooseLevelScreen({super.key});
@@ -24,8 +25,8 @@ class _ChooseLevelScreenState extends State<ChooseLevelScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final levels = const ['Beginner', 'Intermediate', 'Advanced'];
 
+    final levels = const ['Начинающий', 'Средний', 'Продвинутый'];
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -40,13 +41,13 @@ class _ChooseLevelScreenState extends State<ChooseLevelScreen> {
               ),
               const SizedBox(height: 26),
               Text(
-                'What is your current\nKazakh level?',
+                'Насколько хорошо \n вы знаете казахский?',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 8),
               Text(
-                'Select the level of your knowledge about\nthat language',
+                'Выберите уровень знания языка',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
@@ -62,14 +63,17 @@ class _ChooseLevelScreenState extends State<ChooseLevelScreen> {
                       text: lvl,
                       leading: null,
                       selected: selected == lvl,
-                      onTap: () => setState(() => selected = lvl),
+                      onTap: () async {
+                        setState(() => selected = lvl);
+                        await AppStorage.setLevel(lvl);
+                      },
                     );
                   },
                 ),
               ),
 
               const SizedBox(height: 12),
-              PrimaryButton(text: 'NEXT', onPressed: selected == null ? null : _next),
+              PrimaryButton(text: 'ДАЛЬШЕ', onPressed: selected == null ? null : _next),
               const SizedBox(height: 18),
             ],
           ),

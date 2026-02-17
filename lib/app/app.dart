@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'theme.dart';
-
-import '../features/onboarding/splash_screen.dart';
+import 'app_gate.dart';
 
 class TulparApp extends StatelessWidget {
   const TulparApp({super.key});
@@ -12,7 +11,7 @@ class TulparApp extends StatelessWidget {
       title: 'Tulpar',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
-      home: const SplashScreen(),
+      home: const AppGate(),
     );
   }
 }

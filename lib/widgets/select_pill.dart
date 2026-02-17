@@ -3,7 +3,7 @@ import '../app/theme.dart';
 
 class SelectPill extends StatelessWidget {
   final String text;
-  final String? leading; // например 🇪🇸
+  final String? leading;
   final bool selected;
   final VoidCallback onTap;
   final bool compact;

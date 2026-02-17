@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:tulpar_front/features/auth/signup_screen.dart';
 import '../../widgets/primary_button.dart';
 import '../../widgets/progress_header.dart';
 import '../../widgets/select_pill.dart';
-import 'home_stub.dart';
+import '../../app/app_storage.dart';
 
 class DailyGoalScreen extends StatefulWidget {
   const DailyGoalScreen({super.key});
@@ -18,7 +19,7 @@ class _DailyGoalScreenState extends State<DailyGoalScreen> {
     if (selected == null) return;
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const HomeStub()),
+      MaterialPageRoute(builder: (_) => const SignupScreen()),
     );
   }
 
@@ -40,13 +41,13 @@ class _DailyGoalScreenState extends State<DailyGoalScreen> {
               ),
               const SizedBox(height: 26),
               Text(
-                'Set your daily learning\ngoal.',
+                'Ежедневная цель\nобучения.',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 8),
               Text(
-                'Choose how much time you can dedicate\nto learning each day',
+                'Сколько времени вы готовы уделять\nкаждый день?',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
@@ -63,7 +64,10 @@ class _DailyGoalScreenState extends State<DailyGoalScreen> {
                         text: '$m min',
                         leading: null,
                         selected: selected == m,
-                        onTap: () => setState(() => selected = m),
+                        onTap: () async {
+                          setState(() => selected = m);
+                          await AppStorage.setGoalMinutes(m);
+                        },
                         compact: true,
                       ),
                     ),
@@ -81,7 +85,7 @@ class _DailyGoalScreenState extends State<DailyGoalScreen> {
               ),
 
               const Spacer(),
-              PrimaryButton(text: 'GET STARTED', onPressed: selected == null ? null : _start),
+              PrimaryButton(text: 'НАЧАТЬ', onPressed: selected == null ? null : _start),
               const SizedBox(height: 18),
             ],
           ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tulpar_front/features/auth/login_screen.dart';
+import 'package:tulpar_front/features/auth/signup_screen.dart';
 import '../../widgets/primary_button.dart';
 import '../../app/theme.dart';
 import 'choose_level_screen.dart';
@@ -10,6 +12,13 @@ class SetupStartScreen extends StatelessWidget {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const ChooseLevelScreen()),
+    );
+  }
+
+  void _goToLogin(BuildContext context) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
     );
   }
 
@@ -27,7 +36,7 @@ class SetupStartScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Now let’s set up your\nlanguage learning journey.",
+                      "Начнем путь изучения\nязыка.",
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
@@ -47,16 +56,16 @@ class SetupStartScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              PrimaryButton(text: 'GET STARTED', onPressed: () => _go(context)),
+              PrimaryButton(text: 'НАЧАТЬ', onPressed: () => _go(context)),
               const SizedBox(height: 10),
               OutlinedButton(
-                onPressed: () => _go(context),
+                onPressed: () => _goToLogin(context),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 50),
                   side: const BorderSide(color: AppTheme.border),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                 ),
-                child: const Text('I ALREADY HAVE AN ACCOUNT'),
+                child: const Text('У МЕНЯ УЖЕ ЕСТЬ АККАУНТ'),
               ),
               const SizedBox(height: 20),
             ],
