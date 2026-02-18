@@ -8,6 +8,8 @@ class AppStorage {
   static const _kPassHash = 'auth_pass_hash';
   static const _kFirstName = 'first_name';
   static const _kLastName = 'last_name';
+  static const _kUiLang = 'ui_lang';
+  static const _kBioEnabled = 'bio_enabled';
 
   static Future<bool> isLoggedIn() async {
     final p = await SharedPreferences.getInstance();
@@ -80,5 +82,25 @@ class AppStorage {
   static Future<String?> getLastName() async {
     final p = await SharedPreferences.getInstance();
     return p.getString(_kLastName);
+  }
+
+  static Future<void> setUiLang(String lang) async {
+    final p = await SharedPreferences.getInstance();
+    await p.setString(_kUiLang, lang);
+  }
+
+  static Future<String> getUiLang() async {
+    final p = await SharedPreferences.getInstance();
+    return p.getString(_kUiLang) ?? 'ru';
+  }
+
+  static Future<bool> isBioEnabled() async {
+    final p = await SharedPreferences.getInstance();
+    return p.getBool(_kBioEnabled) ?? false;
+  }
+
+  static Future<void> setBioEnabled(bool value) async {
+    final p = await SharedPreferences.getInstance();
+    await p.setBool(_kBioEnabled, value);
   }
 }

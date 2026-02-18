@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:tulpar_front/app/security_service.dart';
+import 'package:tulpar_front/features/auth/set_pin_screen.dart';
 import 'package:tulpar_front/features/setup/home_shell.dart';
 import '../../app/theme.dart';
 import '../../widgets/primary_button.dart';
 import '../../widgets/social_auth_row.dart';
 import '../../app/app_storage.dart';
 import '../../app/password_hash.dart';
-import '../setup/daily_goal_screen.dart';
 import 'login_screen.dart';
 import 'social_auth.dart';
 
@@ -22,7 +23,6 @@ class _SignupScreenState extends State<SignupScreen> {
   final emailCtrl = TextEditingController();
   final passCtrl = TextEditingController();
   final pass2Ctrl = TextEditingController();
-
 
   bool obscure1 = true;
   bool obscure2 = true;
@@ -62,6 +62,20 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
+  Future<void> _goNextAfterAuth() async {
+    await AppStorage.setLoggedIn(true);
+
+    final sec = SecurityService();
+    final hasPin = await sec.hasPin();
+
+    if (!mounted) return;
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => hasPin ? const HomeShell() : const SetPinScreen()),
+    );
+  }
+
   Future<void> _signupWithEmail() async {
     final email = emailCtrl.text.trim();
     final p1 = passCtrl.text;
@@ -86,13 +100,7 @@ class _SignupScreenState extends State<SignupScreen> {
       lastName: last,
     );
 
-    await AppStorage.setLoggedIn(true);
-
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const HomeShell()),
-    );
+    await _goNextAfterAuth();
   }
 
   Future<void> _signupWithGoogle() async {
@@ -103,31 +111,30 @@ class _SignupScreenState extends State<SignupScreen> {
       await AppStorage.saveCredentials(email: acc.email, passwordHash: '');
     }
 
-    await AppStorage.setLoggedIn(true);
+    final displayName = (acc.displayName ?? '').trim();
+    if (displayName.isNotEmpty) {
+      await AppStorage.saveProfile(firstName: displayName, lastName: '');
+    }
 
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const HomeShell()),
-    );
+    await _goNextAfterAuth();
   }
 
   Future<void> _signupWithApple() async {
     final cred = await SocialAuth.signInWithApple();
     if (cred.identityToken == null) return;
 
-    final email = cred.email ?? '';
+    final email = (cred.email ?? '').trim();
     if (email.isNotEmpty) {
       await AppStorage.saveCredentials(email: email, passwordHash: '');
     }
 
-    await AppStorage.setLoggedIn(true);
+    final first = (cred.givenName ?? '').trim();
+    final last = (cred.familyName ?? '').trim();
+    if (first.isNotEmpty || last.isNotEmpty) {
+      await AppStorage.saveProfile(firstName: first.isEmpty ? 'User' : first, lastName: last);
+    }
 
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const DailyGoalScreen()),
-    );
+    await _goNextAfterAuth();
   }
 
   @override

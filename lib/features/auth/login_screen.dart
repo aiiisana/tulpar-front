@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:tulpar_front/app/security_service.dart';
+import 'package:tulpar_front/features/auth/set_pin_screen.dart';
 import 'package:tulpar_front/features/setup/home_shell.dart';
 import '../../app/theme.dart';
 import '../../widgets/primary_button.dart';
 import '../../widgets/social_auth_row.dart';
 import '../../app/app_storage.dart';
 import '../../app/password_hash.dart';
-import '../setup/daily_goal_screen.dart';
 import 'signup_screen.dart';
 import 'social_auth.dart';
 
@@ -53,6 +54,19 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  Future<void> _goNextAfterAuth() async {
+    await AppStorage.setLoggedIn(true);
+
+    final sec = SecurityService();
+    final hasPin = await sec.hasPin();
+
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => hasPin ? const HomeShell() : const SetPinScreen()),
+    );
+  }
+
   Future<void> _loginWithEmail() async {
     final inputEmail = emailCtrl.text.trim();
     final inputPass = passCtrl.text;
@@ -72,13 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    await AppStorage.setLoggedIn(true);
-
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const HomeShell()),
-    );
+    await _goNextAfterAuth();
   }
 
   Future<void> _loginWithGoogle() async {
@@ -89,31 +97,30 @@ class _LoginScreenState extends State<LoginScreen> {
       await AppStorage.saveCredentials(email: acc.email, passwordHash: '');
     }
 
-    await AppStorage.setLoggedIn(true);
+    final displayName = (acc.displayName ?? '').trim();
+    if (displayName.isNotEmpty) {
+      await AppStorage.saveProfile(firstName: displayName, lastName: '');
+    }
 
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const HomeShell()),
-    );
+    await _goNextAfterAuth();
   }
 
   Future<void> _loginWithApple() async {
     final cred = await SocialAuth.signInWithApple();
     if (cred.identityToken == null) return;
 
-    final email = cred.email ?? '';
+    final email = (cred.email ?? '').trim();
     if (email.isNotEmpty) {
       await AppStorage.saveCredentials(email: email, passwordHash: '');
     }
 
-    await AppStorage.setLoggedIn(true);
+    final first = (cred.givenName ?? '').trim();
+    final last = (cred.familyName ?? '').trim();
+    if (first.isNotEmpty || last.isNotEmpty) {
+      await AppStorage.saveProfile(firstName: first.isEmpty ? 'User' : first, lastName: last);
+    }
 
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const HomeShell()),
-    );
+    await _goNextAfterAuth();
   }
 
   @override
